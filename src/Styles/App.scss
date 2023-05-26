@@ -1,0 +1,106 @@
+@import "./light-theme.scss";
+@import "./dark-theme.scss";
+
+
+
+/*----------------------------Light Theme Start-----------------------*/
+.light{
+
+  #welcome-page{
+    background-image: linear-gradient(to right top, $light-sec-main,$light-sec-main, $light-main);
+  }
+  
+
+
+}
+/*----------------------------Light Theme End-----------------------*/
+
+
+/*----------------------------Dark Theme Start-----------------------*/
+.dark{
+  color: $dark-text;
+  #welcome-page{
+  background-image: linear-gradient(to right top, $dark-btn, $dark-main);
+    #form{
+      background-color: $dark-main-opa;
+      
+    }
+  }
+
+} 
+/*----------------------------Dark Theme Endt-----------------------*/
+
+
+.main{
+  font-size: 24px;
+  #welcome-page{
+    width: 100svw;
+    height: 100svh;
+    #welcome-group{
+      display: grid;
+      position: absolute;
+      left: 50%;
+      top: 20%;
+      transform: translate(-50%, -20%);
+      width: clamp(200px, 70%, 5000px);
+      justify-content: center;
+      gap: 3em;
+      #welcome-text{
+        font-size: 2.5em;
+        text-align: center;
+      }
+      #form{
+        border-radius: 20px;
+        padding: 2em 1.5em;
+        #login-form{
+          display: grid;
+          justify-content: center;
+          text-align: center;
+          .form-h2{
+            margin-top: 0.5em;
+            margin-bottom: 2em;
+          }
+          #lpsw{
+            margin-top: 2em;
+            margin-bottom: 1em;
+          }
+          #lbtn{
+            width: 40%;
+            margin: auto;
+            border-radius: 15px;
+            padding: 0.7em;
+            background-color: $dark-btn;
+            color: $dark-text;
+            border: 1px solid $dark-text;
+            cursor: pointer;
+            &:hover{
+              background-color: $dark-btn-hov;
+            }
+          }
+          
+          input{
+            border-radius: 30px;
+            padding: 0.7em;
+            outline: none;
+            border: 1px solid $dark-btn;
+          }
+          input:focus{
+            outline: none;
+          }
+          .form-text{
+            font-size: 0.7em;
+            margin-top: 2em
+          }
+          .demo{
+            margin-top: 1em;
+          }
+        }
+      }
+    }
+  }
+
+}
+.form-h2{
+  font-size: 0.6em;
+}
+
