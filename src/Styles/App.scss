@@ -19,6 +19,7 @@
 /*----------------------------Dark Theme Start-----------------------*/
 .dark{
   color: $dark-text;
+  background-color: $dark-main;
   #welcome-page{
   background-image: linear-gradient(to right top, $dark-btn, $dark-main);
     #form{
@@ -115,7 +116,13 @@
       }
     }
   }
-
+  #main-content{
+    width: 100svw;
+    height: 100svh;
+    #navbar{
+      
+    }
+  }
 }
 .form-h2{
   font-size: 0.6em;
