@@ -120,7 +120,45 @@
     width: 100svw;
     height: 100svh;
     #navbar{
-      
+      position: fixed;
+      height: 100%;
+      width: clamp(6em, 30%, 15em);
+      background-color: $dark-btn;
+      padding: 1em;
+      padding-bottom: 0;
+      display: grid;
+      align-content: space-between;
+      #nav-switch{
+        position: absolute;
+        top: 0.5em;
+        right: 0.5em;
+        &:hover{
+          cursor: pointer;
+        }
+      }
+      #navbar-logoff{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 3em;
+        #user-logoff{
+          
+          &:hover{
+            cursor: pointer;
+          }
+        }
+      }
+      #navbar-element-container{
+        display: grid;
+        gap: 1.5em;
+        margin-top: 2em;
+        .navbar-element{
+          width: fit-content;
+          &:hover{
+            cursor: pointer;
+          }
+        }
+      }
     }
   }
 }

@@ -6,7 +6,7 @@ function MainPage (){
     const {user, displayname}= useContext(UserContext)
     return(
         <div id="main-content">
-            <h1>Hello, {displayname}!</h1>
+            <Navbar/>
         </div>
     )
 }
