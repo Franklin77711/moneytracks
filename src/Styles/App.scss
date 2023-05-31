@@ -61,7 +61,7 @@
             margin-bottom: 2em;
           }
           #lpsw{
-            margin-top: 2em;
+            margin-top: 1em;
             margin-bottom: 1em;
           }
           #lbtn{
@@ -73,9 +73,14 @@
             color: $dark-text;
             border: 1px solid $dark-text;
             cursor: pointer;
+            font-family: 'Quicksand', sans-serif;
             &:hover{
               background-color: $dark-btn-hov;
             }
+          }
+          #lname{
+            margin-top: 2em;
+            margin-bottom: 1em;
           }
           
           input{
@@ -84,12 +89,24 @@
             outline: none;
             border: 1px solid $dark-btn;
           }
+          input::placeholder{
+            font-family: 'Quicksand', sans-serif;
+          }
           input:focus{
             outline: none;
           }
           .form-text{
             font-size: 0.7em;
             margin-top: 2em
+            
+          }
+          .error-message{
+            margin-top: 0.5em;
+            color: $error-red;
+          }
+          .form-text:hover{
+            cursor: pointer;
+            text-decoration: underline;
           }
           .demo{
             margin-top: 1em;
