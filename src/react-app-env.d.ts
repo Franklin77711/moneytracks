@@ -11,7 +11,9 @@ interface LoginProps {
   interface UserContextProps {
     user: string|null;
     displayname: string|null;
+    uid: string|null;
     setUser: (user: string|null) => void;
     setDisplayname: (user: string|null) => void;
+    setUID: (user: string|null) => void;
   }
   

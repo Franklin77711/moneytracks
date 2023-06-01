@@ -24,15 +24,43 @@
   background-image: linear-gradient(to right top, $dark-btn, $dark-main);
     #form{
       background-color: $dark-main-opa;
-      
+      #login-form{
+        #lbtn{
+          background-color: $dark-btn;
+          color: $dark-text;
+          border: 1px solid $dark-text;
+          &:hover{
+            filter: brightness(.9);
+          }
+        }
+        input{
+          border: 1px solid $dark-btn;
+        }
+        .error-message{
+          color: $error-red;
+        }
+      }
     }
   }
-
+  #main-content{
+    #nav-open{
+      background-color: $dark-btn;
+      &:hover{
+        filter:brightness(.9)
+      }
+    }
+    #dashboard{
+      #dash-header{
+        border-bottom: 2px solid $dark-main-opa;
+      }
+    }
+  }
 } 
-/*----------------------------Dark Theme Endt-----------------------*/
+/*----------------------------Dark Theme End-----------------------*/
 
 
 .main{
+  overflow-x: hidden;
   font-size: 24px;
   #welcome-page{
     width: 100svw;
@@ -70,14 +98,8 @@
             margin: auto;
             border-radius: 15px;
             padding: 0.7em;
-            background-color: $dark-btn;
-            color: $dark-text;
-            border: 1px solid $dark-text;
             cursor: pointer;
             font-family: 'Quicksand', sans-serif;
-            &:hover{
-              background-color: $dark-btn-hov;
-            }
           }
           #lname{
             margin-top: 2em;
@@ -88,7 +110,6 @@
             border-radius: 30px;
             padding: 0.7em;
             outline: none;
-            border: 1px solid $dark-btn;
           }
           input::placeholder{
             font-family: 'Quicksand', sans-serif;
@@ -103,7 +124,6 @@
           }
           .error-message{
             margin-top: 0.5em;
-            color: $error-red;
           }
           .form-text:hover{
             cursor: pointer;
@@ -120,17 +140,18 @@
     width: 100svw;
     height: 100svh;
     #navbar{
-      position: fixed;
+      position:fixed;
       height: 100%;
-      width: clamp(6em, 30%, 15em);
       background-color: $dark-btn;
       padding: 1em;
       padding-bottom: 0;
       display: grid;
       align-content: space-between;
+      animation: navopen linear .4s;
+      z-index: 100;
       #nav-switch{
         position: absolute;
-        top: 0.5em;
+        top: 1em;
         right: 0.5em;
         &:hover{
           cursor: pointer;
@@ -151,12 +172,78 @@
       #navbar-element-container{
         display: grid;
         gap: 1.5em;
+        margin-right: 3em;
         margin-top: 2em;
+        padding-bottom: 1em;
+        overflow: hidden;
         .navbar-element{
           width: fit-content;
           &:hover{
             cursor: pointer;
           }
+        }
+      }
+    }
+    #nav-open{
+      position: fixed;
+      top: 1em;
+      left: 1em;
+      z-index: 100;
+      width: 1.5em;
+      height: 1.5em;
+      border-radius: 50%;
+      animation: navclose linear .5s;
+      &:hover{
+        cursor: pointer;
+      }
+      p{
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+    #dashboard{
+      height: 100%;
+      max-width: 3000px;
+      margin: auto;
+      padding-top: 3em;
+      padding-left: clamp(1em, 5%, 3em);
+      padding-right: clamp(1em, 10%, 15em);
+      #loader {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: conic-gradient(#0000 10%,#474bff);
+        -webkit-mask: radial-gradient(farthest-side,#0000 calc(100% - 9px),#000 0);
+        animation: loader 1s infinite linear;
+     }
+     
+      #dash-header{
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 1em;
+        #dash-welcome{
+          display: grid;
+          gap: 0.5em;
+          h1{
+            font-size: 2.7em;
+          }
+          h2{
+            font-size: 1em;
+            filter: contrast(.3);
+          }
+        }
+        #dash-total{
+
         }
       }
     }
@@ -166,3 +253,77 @@
   font-size: 0.6em;
 }
 
+
+@media (max-width:1250px) {
+  .main{
+    #main-content{
+      #dashboard{
+        #dash-header{
+          #dash-welcome{
+            h1{
+              font-size: 2em;
+            }
+            h2{
+              font-size: .7em;
+            }
+          }
+          #dash-total{
+  
+          }
+        }
+      }
+    }
+  }
+}
+@media (max-width:750px) {
+  .main{
+    #main-content{
+      #dashboard{
+        #dash-header{
+          flex-direction: column;
+          align-items:flex-start;
+          justify-content: flex-start;
+          gap: 1em;
+          #dash-welcome{
+            h1{
+              font-size: 1em;
+            }
+            h2{
+              font-size: .7em;
+            }
+          }
+          #dash-total{
+  
+          }
+        }
+      }
+    }
+  }
+}
+@keyframes navopen {
+  0%{
+    width: 0;
+  }
+  50%{
+    width: 5em;
+  }
+  100%{
+    width: 10em;
+  }
+}
+@keyframes navclose {
+  0%{
+    left: 10em;
+  }
+  50%{
+    left: 5em;
+  }
+  100%{
+    left: 1em;
+  }
+}
+@keyframes loader {
+  to {
+     transform: rotate(1turn);
+  }
+}
