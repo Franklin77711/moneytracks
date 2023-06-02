@@ -43,6 +43,11 @@
     }
   }
   #main-content{
+    #navbar{
+      -webkit-box-shadow: 3px 0px 5px 2px rgba(111,52,255,0.6); 
+      box-shadow: 3px 0px 5px 2px rgba(111,52,255,0.6);
+      background-color: $dark-btn;
+    }
     #nav-open{
       background-color: $dark-btn;
       &:hover{
@@ -52,6 +57,17 @@
     #dashboard{
       #dash-header{
         border-bottom: 2px solid $dark-main-opa;
+      }
+      #dash-content{
+        .change-form{
+          background-color: $dark-btn;
+        }
+        .dash-content-child{
+          border: 2px solid $dark-main-opa;
+          .total-btn{
+            border-top: 2px solid $dark-main-opa;
+          }
+        }
       }
     }
   }
@@ -138,11 +154,10 @@
   }
   #main-content{
     width: 100svw;
-    height: 100svh;
+    height: 100vh;
     #navbar{
       position:fixed;
       height: 100%;
-      background-color: $dark-btn;
       padding: 1em;
       padding-bottom: 0;
       display: grid;
@@ -163,7 +178,9 @@
         align-items: center;
         margin-bottom: 3em;
         #user-logoff{
-          
+          #logoff-svg{
+            height: 30px;
+          }
           &:hover{
             cursor: pointer;
           }
@@ -242,10 +259,140 @@
             filter: contrast(.3);
           }
         }
-        #dash-total{
-
+      }
+      #dash-content{
+        margin-top: 2em;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        grid-column-gap: 3em;
+        grid-row-gap: 3em;
+        align-items: center;
+        .dash-content-child{
+          position: relative;
+          .total-money-container{
+            margin: 1.5em;
+            .total-title{
+              font-size: 0.7em;
+              filter: contrast(.8);
+            }
+            .total-money{
+              font-size: 1.5em;
+              margin: .5em 1em;
+            }
+          }
+          .total-btn{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1em;
+            margin: 0;
+            &:hover{
+              cursor: pointer;
+              transition: .5s;
+              background-color: $dark-btn;
+            }
+          }
+          .img-holder{
+           
+            position: absolute;
+            top: 1em;
+            right: 2em;
+            .arrow-img{
+              width: 30px;
+             
+            }
+            .down{
+              border-bottom: 2px solid $error-red;
+            }
+            .up{
+              border-bottom: 2px solid #77dd77;
+            }
+          }
+        }
+        #dash-add-container{
+          grid-area: 1 / 1 / 2 / 2;
+        }
+        #dash-remove-container{
+          grid-area: 1 / 2 / 2 / 3;
+        }
+        #dash-graph-container{
+          grid-area: 2 / 1 / 3 / 3;
+          background-color: #ccc;
+          height: 100%;
+          width: 100%;
+        }
+        .change-form{
+          z-index: 110;
+          border-radius: 20px;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          padding: 3em 2em;
+          display: grid;
+          gap: 1em;
+          .form-container{
+            display: flex;
+            justify-content: space-between;
+            gap: 1em;
+            align-items: center;
+          }
+          .change-btn-container{
+            padding: 0em 2em;
+            .change-btn{
+              border-radius: 20px;
+              padding: .8em;
+              font-family: 'Quicksand', sans-serif;
+              &:hover{
+                cursor: pointer;
+                filter: brightness(.9);
+              }
+            }
+            display: flex;
+            justify-content: space-between;
+          }
+         
+          input{
+            border-radius: 30px;
+            padding: 0.7em;
+            outline: none;
+            &::placeholder{
+              font-family: 'Quicksand', sans-serif;
+            }
+            &:focus{
+              outline: none;
+            }
+            &[type=number]::-webkit-inner-spin-button, 
+            input[type=number]::-webkit-outer-spin-button { 
+              -webkit-appearance: none; 
+              margin: 0; 
+            }
+          }
         }
       }
+    }
+    .overlay{
+      position: fixed;
+      width: 150svw;
+      height: 150svh;
+      top: 0;
+      left: 0;
+      z-index: 105;
+      overflow: hidden;
+      background-color: #000;
+      opacity: .6;
+    }
+    .overlay-nav-open{
+      position: fixed;
+      width: 150svw;
+      height: 150svh;
+      top: 0;
+      left: 0;
+      z-index: 90;
+      overflow: hidden;
+      background-color: #000;
+      opacity: .6;
     }
   }
 }
@@ -267,15 +414,16 @@
               font-size: .7em;
             }
           }
-          #dash-total{
-  
-          }
+        }
+        #dash-content{
+          grid-column-gap: 1em;
+          grid-row-gap: 1em;
         }
       }
     }
   }
 }
-@media (max-width:750px) {
+@media (max-width:800px) {
   .main{
     #main-content{
       #dashboard{
@@ -292,8 +440,55 @@
               font-size: .7em;
             }
           }
-          #dash-total{
-  
+        }
+        #dash-content{
+          display: flex;
+          flex-direction: column;
+          gap: 1em;
+          .change-form{
+            padding: 2.5em 1em;
+            .form-container{
+              flex-direction: column;
+              gap: .5em;
+            }
+            .change-btn-container{
+              padding: 0;
+            }
+          }
+          .dash-content-child{
+            .total-money-container{
+              margin: .5em;
+              .total-title{
+                font-size: 0.7em;
+                filter: contrast(.8);
+              }
+              .total-money{
+                font-size: 1em;
+                margin: .5em .5em;
+                .currency{
+                  font-size: .8em;
+                }
+              }
+            }
+            .total-btn{
+              font-size: .7em;
+            }
+            .img-holder{
+              position: absolute;
+              top: 1em;
+              right: 1em;
+              .arrow-img{
+                width: 30px;
+              }
+            }
+          }
+          #dash-add-container{
+            width: 100%;
+            min-width: 230px;
+          }
+          #dash-remove-container{
+            width: 100%;
+            min-width: 230px;
           }
         }
       }

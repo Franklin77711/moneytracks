@@ -2,6 +2,7 @@ import { useContext, useState } from "react"
 import { app } from "../firebaseConf"; 
 import { signInWithEmailAndPassword, getAuth } from "firebase/auth";
 import { UserContext } from "../Context/loggedinUser";
+import { serverTimestamp } from "firebase/firestore";
 
 
 function Login ({ onSwitchForm }:LoginProps){
@@ -47,7 +48,7 @@ function Login ({ onSwitchForm }:LoginProps){
     }
     return(
         <div>
-            <form action="" id="login-form" onSubmit={handleSubmit}>
+            <form id="login-form" onSubmit={handleSubmit}>
                 <h1 className="form-h1">Welcome Back!</h1>
                 <h2 className="form-h2">Sign in to your account</h2>
                 <input type="email" name="lemail" id="lemail" required placeholder="Email" value={loginEmail} onChange={(e)=>setLoginEmail(e.target.value)} />

@@ -16,4 +16,7 @@ interface LoginProps {
     setDisplayname: (user: string|null) => void;
     setUID: (user: string|null) => void;
   }
+  interface NavbarProps {
+    onTabChange: (tab: string) => void;
+  }
   
