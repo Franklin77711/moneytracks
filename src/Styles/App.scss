@@ -318,9 +318,16 @@
         }
         #dash-graph-container{
           grid-area: 2 / 1 / 3 / 3;
-          background-color: #ccc;
-          height: 100%;
           width: 100%;
+          height: 99%;
+          animation: none;
+          transition: none;
+          padding: 0;
+          #canvasRef{
+            animation: none;
+            transition: none;
+            width: 100%;
+          }
         }
         .change-form{
           z-index: 110;
@@ -337,6 +344,12 @@
             justify-content: space-between;
             gap: 1em;
             align-items: center;
+            .change-option{
+              font-family: 'Quicksand', sans-serif;
+              border-radius: 30px;
+              padding: 0.7em;
+              
+            }
           }
           .change-btn-container{
             padding: 0em 2em;

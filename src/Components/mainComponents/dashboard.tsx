@@ -1,9 +1,16 @@
-import { useEffect, useContext, useState } from "react";
+import { useEffect, useContext, useState, useRef, useLayoutEffect, HtmlHTMLAttributes } from "react";
 import { db } from "../../firebaseConf"
-import { getDocs, collection, query, doc, addDoc, setDoc, getDoc, updateDoc} from "firebase/firestore";
+import { getDocs, collection, query, doc, addDoc, setDoc, getDoc, updateDoc, where, orderBy} from "firebase/firestore";
 import { UserContext } from "../../Context/loggedinUser";
-import upArrow from "../../media/uparrow.svg"
-import downArrow from "../../media/downarrow.svg"
+import upArrow from "../../media/uparrow.svg";
+import downArrow from "../../media/downarrow.svg";
+import expenseCategoryOptions from "../../data/expenseCategory";
+import earnCategoryOptions from "../../data/earnCategory";
+import { Chart, LineController, TimeScale, LinearScale, PointElement, LineElement, Filler} from "chart.js";
+import 'chartjs-adapter-moment';
+
+Chart.register(LineController, TimeScale, LinearScale, PointElement, LineElement);
+
 
 function Dashboard (){
   const { uid, displayname } = useContext(UserContext);
@@ -15,13 +22,21 @@ function Dashboard (){
   const [formAddValue, setFormAddValue] = useState<number|any>(null);
   const [formRemoveValue, setFormRemoveValue] = useState<number|any>(null);
   const [showExpenseForm, setShowExpenseForm] = useState<boolean>(false);
-  const [formSourceValue,setFormSourceValue] = useState<string>("");
-  const [formReasonValue,setFormReasonValue] = useState<string>("");
 
+  const [formSourceValueMain,setFormSourceValueMain] = useState<string>("");
+  const [formSourceValueSub,setFormSourceValueSub] = useState<string>("");
+
+  const [formReasonValueMain,setFormReasonValueMain] = useState<string>("");
+  const [formReasonValueSub,setFormReasonValueSub] = useState<string>("");
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [chartInstance,setChartInstance] = useState<any>();
+
+ 
   useEffect(()=>{
     const clacMoney = totalIncome+totalExpense;
     setCurrMoney(clacMoney)
   }, [totalIncome,totalExpense])
+  
 
   const handleIncomeAdd = (event:any) =>{
     event.preventDefault();
@@ -29,8 +44,10 @@ function Dashboard (){
     updateDocMoneyAdd();
     updateDocMoney();
     createLogFromAdd();
+    renderCanvas();
     setFormAddValue(null)
-    setFormSourceValue("")
+    setFormSourceValueMain("");
+    setFormSourceValueSub("")
     handleCancel();
   }
   const handleExpenseAdd = (event:any)=>{
@@ -39,8 +56,10 @@ function Dashboard (){
     updateDocMoneyRemove();
     updateDocMoneyTotal();
     createLogFromRemove();
+    renderCanvas();
     setFormRemoveValue(null)
-    setFormReasonValue("")
+    setFormReasonValueMain("")
+    setFormReasonValueSub("")
     handleCancel();
   }
 
@@ -81,10 +100,10 @@ const updateDocMoneyTotal = async()=>{
 
       if(docSnap.exists()){
         const currentTime =  new Date().toISOString().substring(0, 19)
-        const transactionsCollectionRef = doc(userDocRef, "transactions", currentTime);
+        const transactionsCollectionRef:any = doc(userDocRef, "transactions", currentTime);
         const transactionDocRef = await getDoc(transactionsCollectionRef);
         if(!transactionDocRef.exists()){
-          await setDoc(transactionsCollectionRef, { add: formAddValue, remove: formRemoveValue, forwhat: formSourceValue});
+          await setDoc(transactionsCollectionRef, { add: formAddValue, category: formSourceValueMain, categorySub:formSourceValueSub,  moneyTotal: currMoney});
         }
       }
     }
@@ -99,7 +118,7 @@ const updateDocMoneyTotal = async()=>{
         const transactionsCollectionRef = doc(userDocRef, "transactions", currentTime);
         const transactionDocRef = await getDoc(transactionsCollectionRef);
         if(!transactionDocRef.exists()){
-          await setDoc(transactionsCollectionRef, { add: formAddValue, remove: formRemoveValue, forwhat: formReasonValue});
+          await setDoc(transactionsCollectionRef, { remove: formRemoveValue, category: formReasonValueMain, categorySub:formReasonValueSub,  moneyTotal: currMoney});
         }
       }
     }
@@ -145,17 +164,18 @@ const updateDocMoneyTotal = async()=>{
           const transactionsCollectionRef = doc(userDocRef, "transactions", currentTime);
           const transactionDocRef = await getDoc(transactionsCollectionRef);
           if(!transactionDocRef.exists()){
-            await setDoc(transactionsCollectionRef, { add: 0, remove: 0, forwhat: ""});
+            await setDoc(transactionsCollectionRef, { add: 0, remove: 0, forwhat: "", moneyTotal: 0});
           }
         }
 
         setDocWriteCompleted(true)
+        renderCanvas()
       }
     };
     createUserDocument();
   }, [uid]);
 
-   useEffect(() => {
+  useEffect(() => {
       const currentMoney = async () => {
         if (uid && docWriteCompleted) {
           const docRef = doc(db, 'users', uid);
@@ -170,7 +190,80 @@ const updateDocMoneyTotal = async()=>{
         }
       };
       currentMoney();
-    }, [docWriteCompleted]);
+  }, [docWriteCompleted]);
+
+  
+  const drawLineChart = (timestamps:any, totalMoneyValues:any) => {
+    const canvas: HTMLCanvasElement | null = canvasRef.current;
+    if(canvas){
+      const context:any = canvas.getContext("2d");
+
+    const chart = new Chart(context, {
+      type: 'line',
+      data: {
+        labels: timestamps,
+        datasets: [
+          {
+            label: 'Money',
+            data: totalMoneyValues,
+            borderColor: "#6f34ff",
+            fill: true,
+          },
+        ],
+      },
+      options: {
+        animation: false,
+        maintainAspectRatio: true,
+        responsive: true,
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              unit: 'day',
+            },
+          },
+        },
+      },
+    });
+    setChartInstance(chart)
+  }
+    
+  };
+
+  const fetchTransactions = async () => {
+    if(uid){
+    const userDocRef = doc(db, "users", uid);
+    const transactionsRef = collection(userDocRef, "transactions");
+    const transactionsSnapshot = await getDocs(transactionsRef);
+
+  
+    const timestamps:any = [];
+    const totalMoneyValues:any = [];
+      if(transactionsSnapshot){
+    transactionsSnapshot.forEach((doc) => {
+      const {moneyTotal } = doc.data();
+      totalMoneyValues.push(moneyTotal);
+
+      const timestamp = doc.id
+      timestamps.push(timestamp)
+    });
+    drawLineChart(timestamps, totalMoneyValues);
+  }
+
+  }
+  };
+
+const renderCanvas = ()=>{
+  if(uid){
+    const canvasElement = document.getElementById("canvasRef") as HTMLCanvasElement;
+    canvasRef.current = canvasElement;
+    fetchTransactions()
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+}
+  
       
     return(
       <div id="dashboard">
@@ -204,8 +297,28 @@ const updateDocMoneyTotal = async()=>{
                               <input placeholder="HUF" required className="change-input" id="addForm" type="number" onChange={(e)=>{setFormAddValue(e.target.valueAsNumber)}} value={formAddValue} min={1}></input>
                             </div>
                             <div className="form-container">
-                              <label htmlFor="addSource">Source:</label>
-                              <input placeholder={totalIncome === 0 ? "First upload": "Part-time job"} required className="change-input" id="addSource" type="text" onChange={(e)=>{setFormSourceValue(e.target.value)}} value={formSourceValue}></input>
+                              <label htmlFor="main-category-add">Category:</label>
+                              <select onChange={(e) => setFormSourceValueMain(e.target.value)} className="change-option" id="main-category-add">
+                                <option value="">Select Main Category</option>
+                                {earnCategoryOptions.map((category) => (
+                                  <option key={category.value} value={category.value}>
+                                    {category.label}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                            <div className="form-container">
+                              <label htmlFor="sub-category-add">Sub-Category:</label>
+                              <select onChange={(e) => setFormSourceValueSub(e.target.value)} disabled={formSourceValueMain == ""} className="change-option" id="sub-category-add">
+                                  <option value="">Select Sub Category</option>
+                                  {earnCategoryOptions
+                                    .find((category) => category.value === formSourceValueMain)
+                                    ?.subcategories.map((subcategory) => (
+                                      <option key={subcategory} value={subcategory}>
+                                        {subcategory}
+                                      </option>
+                                    ))}
+                              </select>
                             </div>
                             <div className="change-btn-container">
                               <button className="change-btn" type="button" onClick={handleCancel}>Cancel</button>
@@ -229,15 +342,37 @@ const updateDocMoneyTotal = async()=>{
                               <input placeholder="HUF" required className="change-input" id="expenseForm" type="number" onChange={(e)=>{setFormRemoveValue(e.target.valueAsNumber)}} value={formRemoveValue} min={1}></input>
                             </div>
                             <div className="form-container">
-                              <label htmlFor="expenseReason">Reason:</label>
-                              <input placeholder="Party" required className="change-input" id="expenseReason" type="text" onChange={(e)=>{setFormReasonValue(e.target.value)}} value={formReasonValue}></input>
-                            </div>
+                              <label htmlFor="main-category-remove">Category:</label>
+                              <select onChange={(e) => setFormReasonValueMain(e.target.value)} className="change-option" id="main-category-remove">
+                                  <option value="" >Select Main Category</option>
+                                  {expenseCategoryOptions.map((category) => (
+                                    <option key={category.value} value={category.value}>
+                                      {category.label}
+                                    </option>
+                                  ))}
+                              </select>
+                              </div>
+                              <div className="form-container">
+                                <label htmlFor="sub-category-remove"> Sub-Category:</label>
+                                <select onChange={(e) => setFormReasonValueSub(e.target.value)} disabled={formReasonValueMain == ""} className="change-option" id="sub-category-remove" required>
+                                    <option value="">Select Sub Category</option>
+                                    {expenseCategoryOptions
+                                      .find((category) => category.value === formReasonValueMain)
+                                      ?.subcategories.map((subcategory) => (
+                                        <option key={subcategory} value={subcategory}>
+                                          {subcategory}
+                                        </option>
+                                      ))}
+                                </select>
+                              </div>
                             <div className="change-btn-container">
                               <button className="change-btn" type="button" onClick={handleCancel}>Cancel</button>
                               <button className="change-btn" type="submit">Add Expense</button>
                             </div>
                         </form>:""}
-          <div className="dash-content-child" id="dash-graph-container">3</div>
+          <div className="dash-content-child" id="dash-graph-container">
+            <canvas id="canvasRef" ref={canvasRef}></canvas>
+          </div>
           </div>
         </>
         :
