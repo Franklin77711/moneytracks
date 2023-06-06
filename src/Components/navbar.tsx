@@ -30,9 +30,7 @@ const Navbar: React.FC<NavbarProps> = ({ onTabChange }) => {
                 
                 <div id="navbar-element-container">
                     <div id="nav-dashboard" className="navbar-element" onClick={() => handleTabSwitch("dashboard")}>Dashboard</div>
-                    <div id="nav-goals" className="navbar-element" onClick={() => handleTabSwitch("goals")}>Goals</div>
                     <div id="nav-history" className="navbar-element" onClick={() => handleTabSwitch("history")}>History</div>
-                    <div id="nav-history" className="navbar-element" onClick={() => handleTabSwitch("exchange")}>Exchange Rates</div>
                     <div id="nav-settings" className="navbar-element" onClick={() => handleTabSwitch("settings")}>Settings</div>
                 </div>
                 <div id="navbar-logoff">

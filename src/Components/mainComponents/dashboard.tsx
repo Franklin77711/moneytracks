@@ -79,8 +79,8 @@ function Dashboard (){
       await updateDoc(userDocRef, {money: updatedMoney})
     }
   }
-}
-const updateDocMoneyTotal = async()=>{
+  }
+  const updateDocMoneyTotal = async()=>{
   if (uid) {
   const userDocRef = doc(db, "users", uid);
   const docSnap = await getDoc(userDocRef);
@@ -92,7 +92,7 @@ const updateDocMoneyTotal = async()=>{
     await updateDoc(userDocRef, {money: updatedMoney})
   }
 }
-}
+  }
   const createLogFromAdd = async()=>{
     if (uid) {
       const userDocRef = doc(db, "users", uid);
@@ -103,7 +103,7 @@ const updateDocMoneyTotal = async()=>{
         const transactionsCollectionRef:any = doc(userDocRef, "transactions", currentTime);
         const transactionDocRef = await getDoc(transactionsCollectionRef);
         if(!transactionDocRef.exists()){
-          await setDoc(transactionsCollectionRef, { add: formAddValue, category: formSourceValueMain, categorySub:formSourceValueSub,  moneyTotal: currMoney});
+          await setDoc(transactionsCollectionRef, { add: formAddValue, category: formSourceValueMain, categorySub:formSourceValueSub,  moneyTotal: currMoney, timeStamp: currentTime});
         }
       }
     }
@@ -118,7 +118,7 @@ const updateDocMoneyTotal = async()=>{
         const transactionsCollectionRef = doc(userDocRef, "transactions", currentTime);
         const transactionDocRef = await getDoc(transactionsCollectionRef);
         if(!transactionDocRef.exists()){
-          await setDoc(transactionsCollectionRef, { remove: formRemoveValue, category: formReasonValueMain, categorySub:formReasonValueSub,  moneyTotal: currMoney});
+          await setDoc(transactionsCollectionRef, { remove: formRemoveValue, category: formReasonValueMain, categorySub:formReasonValueSub,  moneyTotal: currMoney, timeStamp: currentTime});
         }
       }
     }
@@ -164,7 +164,7 @@ const updateDocMoneyTotal = async()=>{
           const transactionsCollectionRef = doc(userDocRef, "transactions", currentTime);
           const transactionDocRef = await getDoc(transactionsCollectionRef);
           if(!transactionDocRef.exists()){
-            await setDoc(transactionsCollectionRef, { add: 0, remove: 0, forwhat: "", moneyTotal: 0});
+            await setDoc(transactionsCollectionRef, { add: 0, remove: 0, category: "", cetegorySub: "", moneyTotal: 0,  timeStamp: currentTime});
           }
         }
 
@@ -253,16 +253,15 @@ const updateDocMoneyTotal = async()=>{
   }
   };
 
-const renderCanvas = ()=>{
+  const renderCanvas = ()=>{
   if(uid){
     const canvasElement = document.getElementById("canvasRef") as HTMLCanvasElement;
     canvasRef.current = canvasElement;
     fetchTransactions()
       .catch((error) => {
-        console.log(error);
       });
   }
-}
+  } 
   
       
     return(
@@ -276,14 +275,20 @@ const renderCanvas = ()=>{
               <h2>welcome back to you wallet</h2>
             </div>
             <div id="dash-total">
-              Total money: {currMoney} HUF
+              Total money: {currMoney?.toLocaleString('en-US', {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0
+                })} HUF
             </div>
           </div>
           <div id="dash-content">
           <div className="dash-content-child" id="dash-add-container">
             <div className="total-money-container">
               <p className="total-title">TOTAL INCOME</p>
-              <p className="total-money">{totalIncome} <span className="currency">HUF</span></p>
+              <p className="total-money">{totalIncome.toLocaleString('en-US', {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0
+                })} <span className="currency">HUF</span></p>
             </div>
             <div className="total-btn" onClick={()=>{setShowAddForm(true)}}>
               <p>Add Income</p>
@@ -328,7 +333,10 @@ const renderCanvas = ()=>{
           <div className="dash-content-child" id="dash-remove-container">
             <div className="total-money-container">
               <p className="total-title">TOTAL EXPENSE</p>
-              <p className="total-money">{totalExpense} <span className="currency">HUF</span></p>
+              <p className="total-money">{totalExpense.toLocaleString('en-US', {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0
+                })} <span className="currency">HUF</span></p>
             </div>
             <div className="total-btn" onClick={()=>{setShowExpenseForm(true)}}>
               <p>Add Expense</p>
