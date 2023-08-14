@@ -1,19 +1,18 @@
-import { useEffect, useContext, useState, useRef, useLayoutEffect, HtmlHTMLAttributes } from "react";
+import { useEffect, useContext, useState, useRef } from "react";
 import { db } from "../../firebaseConf"
-import { getDocs, collection, query, doc, addDoc, setDoc, getDoc, updateDoc, where, orderBy} from "firebase/firestore";
+import { getDocs, collection, doc, setDoc, getDoc, updateDoc,} from "firebase/firestore";
 import { UserContext } from "../../Context/loggedinUser";
 import upArrow from "../../media/uparrow.svg";
 import downArrow from "../../media/downarrow.svg";
 import expenseCategoryOptions from "../../data/expenseCategory";
 import earnCategoryOptions from "../../data/earnCategory";
-import { Chart, LineController, TimeScale, LinearScale, PointElement, LineElement, Filler} from "chart.js";
-import 'chartjs-adapter-moment';
-
-Chart.register(LineController, TimeScale, LinearScale, PointElement, LineElement);
+import { Chart } from "react-google-charts";
+import { TransactionContext } from "../../Context/docSnaps";
 
 
 function Dashboard (){
   const { uid, displayname } = useContext(UserContext);
+  const {userDoc, transactionDoc, userDocRef, transactionDocRef, setUserDoc, setTransactionDoc, setUserDocRef, setTransactionDocRef} = useContext(TransactionContext)
   const [currMoney, setCurrMoney]=useState<number>();
   const [docWriteCompleted, setDocWriteCompleted] = useState<boolean>(false);
   const [totalIncome, setTotalIncome]=useState<number>(0);
@@ -28,15 +27,37 @@ function Dashboard (){
 
   const [formReasonValueMain,setFormReasonValueMain] = useState<string>("");
   const [formReasonValueSub,setFormReasonValueSub] = useState<string>("");
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [chartInstance,setChartInstance] = useState<any>();
 
- 
+  const [chartData, setChartData] = useState<Array<[string, number]>>([]);
+
+  const [docRead, setDocRead] = useState<boolean>(false);
+
+
+ useEffect(()=>{
+  if (uid) {
+  const createUserDocument = async () => {
+      const userDocRefCall = doc(db, "users", uid);
+      setUserDocRef(userDocRefCall)
+      const docSnapUsers = await getDoc(userDocRefCall);
+      setUserDoc(docSnapUsers)
+
+      const docRef = collection(db, 'users', uid, "transactions");
+      setTransactionDocRef(docRef)
+      const docSnapTransaction = await getDocs(docRef);
+      setTransactionDoc(docSnapTransaction)
+
+      setDocRead(true)
+    }
+    createUserDocument()
+ }}, [uid])
+
+
   useEffect(()=>{
+    if (docRead) {
     const clacMoney = totalIncome+totalExpense;
     setCurrMoney(clacMoney)
+    }
   }, [totalIncome,totalExpense])
-  
 
   const handleIncomeAdd = (event:any) =>{
     event.preventDefault();
@@ -44,7 +65,6 @@ function Dashboard (){
     updateDocMoneyAdd();
     updateDocMoney();
     createLogFromAdd();
-    renderCanvas();
     setFormAddValue(null)
     setFormSourceValueMain("");
     setFormSourceValueSub("")
@@ -56,7 +76,6 @@ function Dashboard (){
     updateDocMoneyRemove();
     updateDocMoneyTotal();
     createLogFromRemove();
-    renderCanvas();
     setFormRemoveValue(null)
     setFormReasonValueMain("")
     setFormReasonValueSub("")
@@ -69,10 +88,8 @@ function Dashboard (){
   }
   const updateDocMoney = async()=>{
     if (uid) {
-    const userDocRef = doc(db, "users", uid);
-    const docSnap = await getDoc(userDocRef);
-    if(docSnap.exists()){
-      const currentDocMoney = docSnap.data();
+    if(userDoc.exists()){
+      const currentDocMoney = userDoc.data();
 
       const updatedMoney = currentDocMoney.money + formAddValue;
 
@@ -82,10 +99,8 @@ function Dashboard (){
   }
   const updateDocMoneyTotal = async()=>{
   if (uid) {
-  const userDocRef = doc(db, "users", uid);
-  const docSnap = await getDoc(userDocRef);
-  if(docSnap.exists()){
-    const currentDocMoney = docSnap.data();
+  if(userDoc.exists()){
+    const currentDocMoney = userDoc.data();
 
     const updatedMoney = currentDocMoney.money - formRemoveValue;
 
@@ -95,174 +110,96 @@ function Dashboard (){
   }
   const createLogFromAdd = async()=>{
     if (uid) {
-      const userDocRef = doc(db, "users", uid);
-      const docSnap = await getDoc(userDocRef);
 
-      if(docSnap.exists()){
+      if(userDoc.exists()){
         const currentTime =  new Date().toISOString().substring(0, 19)
         const transactionsCollectionRef:any = doc(userDocRef, "transactions", currentTime);
-        const transactionDocRef = await getDoc(transactionsCollectionRef);
-        if(!transactionDocRef.exists()){
-          await setDoc(transactionsCollectionRef, { add: formAddValue, category: formSourceValueMain, categorySub:formSourceValueSub,  moneyTotal: currMoney, timeStamp: currentTime});
-        }
+        await setDoc(transactionsCollectionRef, { add: formAddValue, category: formSourceValueMain, categorySub:formSourceValueSub,  moneyTotal: currMoney, timeStamp: currentTime});
       }
     }
   }
   const createLogFromRemove = async()=>{
     if (uid) {
-      const userDocRef = doc(db, "users", uid);
-      const docSnap = await getDoc(userDocRef);
 
-      if(docSnap.exists()){
+      if(userDoc.exists()){
         const currentTime =  new Date().toISOString().substring(0, 19)
         const transactionsCollectionRef = doc(userDocRef, "transactions", currentTime);
-        const transactionDocRef = await getDoc(transactionsCollectionRef);
-        if(!transactionDocRef.exists()){
-          await setDoc(transactionsCollectionRef, { remove: formRemoveValue, category: formReasonValueMain, categorySub:formReasonValueSub,  moneyTotal: currMoney, timeStamp: currentTime});
-        }
+        await setDoc(transactionsCollectionRef, { remove: formRemoveValue, category: formReasonValueMain, categorySub:formReasonValueSub,  moneyTotal: currMoney, timeStamp: currentTime});
       }
     }
   }
 
   const updateDocMoneyAdd = async () => {
     if (uid) {
-      const userDocRef = doc(db, "users", uid);
-      const docSnap = await getDoc(userDocRef);
-      if(docSnap.exists()){
-        const currentIncome = docSnap.data();
-
+      if(userDoc.exists()){
+        const currentIncome = userDoc.data();
         const updatedIncome = currentIncome.income + formAddValue;
-
         await updateDoc(userDocRef, {income: updatedIncome})
       }
     }
   }
   const updateDocMoneyRemove = async () => {
     if (uid) {
-      const userDocRef = doc(db, "users", uid);
-      const docSnap = await getDoc(userDocRef);
-      if(docSnap.exists()){
-        const currentIncome = docSnap.data();
-
+      if(userDoc.exists()){
+        const currentIncome = userDoc.data();
         const updatedIncome = currentIncome.expense - formRemoveValue;
-
         await updateDoc(userDocRef, {expense: updatedIncome})
       }
     }
   }
 
   useEffect(() => {
+    if (docRead) {
     const createUserDocument = async () => {
-      if (uid) {
-        const userDocRef = doc(db, "users", uid);
-        const docSnap = await getDoc(userDocRef);
-
-        if(!docSnap.exists()){
+        if(!userDoc.exists()){
           await setDoc(userDocRef, {money: 0, income: 0, expense: 0})
-
           const currentTime =  new Date().toISOString().substring(0, 19)
           const transactionsCollectionRef = doc(userDocRef, "transactions", currentTime);
-          const transactionDocRef = await getDoc(transactionsCollectionRef);
-          if(!transactionDocRef.exists()){
-            await setDoc(transactionsCollectionRef, { add: 0, remove: 0, category: "", cetegorySub: "", moneyTotal: 0,  timeStamp: currentTime});
-          }
+          await setDoc(transactionsCollectionRef, { add: 0, remove: 0, category: "", cetegorySub: "", moneyTotal: 0,  timeStamp: currentTime});
         }
 
         setDocWriteCompleted(true)
-        renderCanvas()
       }
-    };
     createUserDocument();
-  }, [uid]);
+  };
+  }, [docRead]);
 
   useEffect(() => {
+    if (uid && docWriteCompleted) {
       const currentMoney = async () => {
-        if (uid && docWriteCompleted) {
-          const docRef = doc(db, 'users', uid);
-          const docSnap = await getDoc(docRef);
-        
-          if (docSnap.exists()) {
-            const data = docSnap.data();
+          if (userDoc.exists()) {
+            const data = userDoc.data();
             setCurrMoney(data.money)
             setTotalIncome(data.income)
             setTotalExpense(data.expense)
           }
         }
-      };
+
       currentMoney();
+    };
   }, [docWriteCompleted]);
 
-  
-  const drawLineChart = (timestamps:any, totalMoneyValues:any) => {
-    const canvas: HTMLCanvasElement | null = canvasRef.current;
-    if(canvas){
-      const context:any = canvas.getContext("2d");
-
-    const chart = new Chart(context, {
-      type: 'line',
-      data: {
-        labels: timestamps,
-        datasets: [
-          {
-            label: 'Money',
-            data: totalMoneyValues,
-            borderColor: "#6f34ff",
-            fill: true,
-          },
-        ],
-      },
-      options: {
-        animation: false,
-        maintainAspectRatio: true,
-        responsive: true,
-        scales: {
-          x: {
-            type: 'time',
-            time: {
-              unit: 'day',
-            },
-          },
-        },
-      },
-    });
-    setChartInstance(chart)
+  useEffect(()=>{
+    if (docRead) {
+    const getData = async () => {
+      
+        const docArrays:any = [["Date", "Totalmoney"]];
+        
+        transactionDoc.forEach((doc:any)=>{
+          const data = doc.data();
+          const { timeStamp, moneyTotal } = data;
+          docArrays.push([ timeStamp, moneyTotal ])
+        })
+        const dataRows = docArrays.slice(1);
+        const formattedData = dataRows.map((row:[string, number]) => [row[0].slice(0,10), Number(row[1])]);
+        const formattedDocArrays = [docArrays[0], ...formattedData];
+        setChartData(formattedDocArrays)
+    }
+    getData()
   }
     
-  };
+  }, [docWriteCompleted])
 
-  const fetchTransactions = async () => {
-    if(uid){
-    const userDocRef = doc(db, "users", uid);
-    const transactionsRef = collection(userDocRef, "transactions");
-    const transactionsSnapshot = await getDocs(transactionsRef);
-
-  
-    const timestamps:any = [];
-    const totalMoneyValues:any = [];
-      if(transactionsSnapshot){
-    transactionsSnapshot.forEach((doc) => {
-      const {moneyTotal } = doc.data();
-      totalMoneyValues.push(moneyTotal);
-
-      const timestamp = doc.id
-      timestamps.push(timestamp)
-    });
-    drawLineChart(timestamps, totalMoneyValues);
-  }
-
-  }
-  };
-
-  const renderCanvas = ()=>{
-  if(uid){
-    const canvasElement = document.getElementById("canvasRef") as HTMLCanvasElement;
-    canvasRef.current = canvasElement;
-    fetchTransactions()
-      .catch((error) => {
-      });
-  }
-  } 
-  
       
     return(
       <div id="dashboard">
@@ -285,10 +222,10 @@ function Dashboard (){
           <div className="dash-content-child" id="dash-add-container">
             <div className="total-money-container">
               <p className="total-title">TOTAL INCOME</p>
-              <p className="total-money">{totalIncome.toLocaleString('en-US', {
+              <p className="total-money"><span className="income-value">{totalIncome.toLocaleString('en-US', {
                   minimumFractionDigits: 0,
                   maximumFractionDigits: 0
-                })} <span className="currency">HUF</span></p>
+                })} </span><span className="currency">HUF</span></p>
             </div>
             <div className="total-btn" onClick={()=>{setShowAddForm(true)}}>
               <p>Add Income</p>
@@ -333,10 +270,10 @@ function Dashboard (){
           <div className="dash-content-child" id="dash-remove-container">
             <div className="total-money-container">
               <p className="total-title">TOTAL EXPENSE</p>
-              <p className="total-money">{totalExpense.toLocaleString('en-US', {
+              <p className="total-money"><span className="income-value">{totalExpense.toLocaleString('en-US', {
                   minimumFractionDigits: 0,
                   maximumFractionDigits: 0
-                })} <span className="currency">HUF</span></p>
+                })}</span> <span className="currency">HUF</span></p>
             </div>
             <div className="total-btn" onClick={()=>{setShowExpenseForm(true)}}>
               <p>Add Expense</p>
@@ -379,7 +316,32 @@ function Dashboard (){
                             </div>
                         </form>:""}
           <div className="dash-content-child" id="dash-graph-container">
-            <canvas id="canvasRef" ref={canvasRef}></canvas>
+          <Chart
+      chartType="LineChart"
+      width="100%"
+      height="400px"
+      legendToggle
+      data={chartData}
+      options={
+        {
+          legend: 'none',
+          format: 'decimal',
+          colors: ['#6f34ff'],
+          lineWidth: 4,
+          backgroundColor: 'transparent',
+          hAxis: {
+            textStyle: {
+              color: 'white'
+            },
+          },
+          vAxis: {
+            textStyle: {
+              color: 'white'
+            }
+          }
+        }
+      }
+    />
           </div>
           </div>
         </>

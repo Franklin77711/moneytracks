@@ -16,6 +16,17 @@ interface LoginProps {
     setDisplayname: (user: string|null) => void;
     setUID: (user: string|null) => void;
   }
+
+  interface TransactionContextProps {
+    userDoc: any;
+    transactionDoc: any;
+    userDocRef: any;
+    transactionDocRef: any;
+    setUserDoc: (userDoc: any) => void;
+    setTransactionDoc: (transactionDoc: any) => void;
+    setUserDocRef:(userDocRef: any) => void;
+    setTransactionDocRef: (transactionDocRef: any) => void;
+  }
   interface NavbarProps {
     onTabChange: (tab: string) => void;
   }

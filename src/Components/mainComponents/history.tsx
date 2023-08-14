@@ -87,15 +87,21 @@ function History (){
                     </tr>
                   </thead>
                   <tbody>
-                    {docSpanRender.map((doc: any, index: number) => {
+                    {docSpanRender.slice().reverse().map((doc: any, index: number) => {
                       if (!doc.timeStamp || doc.category == "") {
                         return null;
                       }
                       return(
-                      <tr key={doc.id}>
+                      <tr key={index}>
                         <td>{doc.timeStamp.slice(0, 10) || '-'}</td>
-                        <td className="addHistory">{doc.add || '-'}</td>
-                        <td className="removeHistory">{doc.remove || '-'}</td>
+                        {doc.add ? <td className="addHistory">{doc.add.toLocaleString('en-US', {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0
+                })}</td>:<td className="addHistory">-</td>}
+                        {doc.remove ? <td className="removeHistory">{doc.remove.toLocaleString('en-US', {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0
+                })}</td>:<td className="removeHistory">-</td>}
                         <td>{doc.category || '-'}</td>
                         <td>{doc.categorySub || '-'}</td>
                       </tr>

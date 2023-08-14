@@ -221,7 +221,6 @@
       }
     }
     #dashboard{
-      height: 100%;
       max-width: 3000px;
       margin: auto;
       padding-top: 3em;
@@ -279,6 +278,12 @@
             .total-money{
               font-size: 1.5em;
               margin: .5em 1em;
+              white-space: pre-wrap;
+              .income-value {
+                display: inline-block;
+                max-width: 100%;
+                word-wrap: break-word;
+              }
             }
           }
           .total-btn{
@@ -297,7 +302,7 @@
            
             position: absolute;
             top: 1em;
-            right: 2em;
+            right: 1em;
             .arrow-img{
               width: 30px;
              
@@ -318,11 +323,7 @@
         }
         #dash-graph-container{
           grid-area: 2 / 1 / 3 / 3;
-          width: 100%;
-          height: 99%;
-          animation: none;
-          transition: none;
-          padding: 0;
+          padding: 0em;
           box-sizing: border-box;
           #canvasRef{
             box-sizing: border-box;
@@ -555,8 +556,8 @@
             }
             .img-holder{
               position: absolute;
-              top: 1em;
-              right: 1em;
+              top: .2em;
+              right: .5em;
               .arrow-img{
                 width: 30px;
               }
@@ -573,6 +574,7 @@
         }
       }
       #history{
+        overflow-x:scroll;
         table{
           font-size: .5em;
           thead{
