@@ -385,6 +385,21 @@
         }
       }
     }
+    #statistics{
+      #main-category-charts{
+        display: flex;
+        width: 100svw;
+        .mainChartTitle{
+        text-align: center;
+        margin-top: 3em;
+        margin-bottom: -1em;
+        }
+        .chart{
+          width: 100%;
+          height: fit-content;
+        }
+      }
+    }
     #history{
       text-align: center;
       #history-buttons{
@@ -593,6 +608,20 @@
                 border-bottom: 2px solid $dark-main-opa;
               }
             }
+          }
+        }
+      }
+      #statistics{
+        #main-category-charts{
+          flex-direction: column;
+          .mainChartTitle{
+          text-align: center;
+          margin-top: 3em;
+          margin-bottom: -1em;
+          }
+          .chart{
+            width: 100%;
+            height: 300px;
           }
         }
       }

@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react"
 import { UserContext } from "../Context/loggedinUser"
 import Navbar from "./navbar"
 import Dashboard from "./mainComponents/dashboard"
+import Statistics from "./mainComponents/statistics"
 import History from "./mainComponents/history"
 import Settings from "./mainComponents/settings"
 import { getAuth } from 'firebase/auth';
@@ -27,6 +28,7 @@ function MainPage (){
         <div id="main-content">
             <Navbar onTabChange={handleTabChange}/>
             {activeTab === 'dashboard' && <Dashboard />}
+            {activeTab === 'statistics' && <Statistics />}
             {activeTab === 'history' && <History />}
             {activeTab === 'settings' && <Settings />}
         </div>

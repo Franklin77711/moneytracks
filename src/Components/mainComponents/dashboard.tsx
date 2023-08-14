@@ -33,7 +33,7 @@ function Dashboard (){
   const [docRead, setDocRead] = useState<boolean>(false);
 
 
- useEffect(()=>{
+ useEffect(()=>{ //get the user documents from Firebase
   if (uid) {
   const createUserDocument = async () => {
       const userDocRefCall = doc(db, "users", uid);
@@ -52,7 +52,7 @@ function Dashboard (){
  }}, [uid])
 
 
-  useEffect(()=>{
+  useEffect(()=>{ //update total money
     if (docRead) {
     const clacMoney = totalIncome+totalExpense;
     setCurrMoney(clacMoney)
@@ -82,11 +82,11 @@ function Dashboard (){
     handleCancel();
   }
 
-  const handleCancel = () =>{
+  const handleCancel = () =>{ //cancel add/expense form
     setShowAddForm(false)
     setShowExpenseForm(false)
   }
-  const updateDocMoney = async()=>{
+  const updateDocMoney = async()=>{ //update total money in Firebase afterAdd
     if (uid) {
     if(userDoc.exists()){
       const currentDocMoney = userDoc.data();
@@ -97,7 +97,7 @@ function Dashboard (){
     }
   }
   }
-  const updateDocMoneyTotal = async()=>{
+  const updateDocMoneyTotal = async()=>{ //update total money in Firebase after remove
   if (uid) {
   if(userDoc.exists()){
     const currentDocMoney = userDoc.data();
@@ -107,8 +107,8 @@ function Dashboard (){
     await updateDoc(userDocRef, {money: updatedMoney})
   }
 }
-  }
-  const createLogFromAdd = async()=>{
+  } 
+  const createLogFromAdd = async()=>{  //log create to firebase from add
     if (uid) {
 
       if(userDoc.exists()){
@@ -118,7 +118,7 @@ function Dashboard (){
       }
     }
   }
-  const createLogFromRemove = async()=>{
+  const createLogFromRemove = async()=>{ //log create to firebase from remove
     if (uid) {
 
       if(userDoc.exists()){
@@ -129,7 +129,7 @@ function Dashboard (){
     }
   }
 
-  const updateDocMoneyAdd = async () => {
+  const updateDocMoneyAdd = async () => { //update total add in firebase
     if (uid) {
       if(userDoc.exists()){
         const currentIncome = userDoc.data();
@@ -138,7 +138,7 @@ function Dashboard (){
       }
     }
   }
-  const updateDocMoneyRemove = async () => {
+  const updateDocMoneyRemove = async () => { //update total remove from firebase
     if (uid) {
       if(userDoc.exists()){
         const currentIncome = userDoc.data();
@@ -148,7 +148,7 @@ function Dashboard (){
     }
   }
 
-  useEffect(() => {
+  useEffect(() => { //create user in firebase for new user
     if (docRead) {
     const createUserDocument = async () => {
         if(!userDoc.exists()){
@@ -164,7 +164,7 @@ function Dashboard (){
   };
   }, [docRead]);
 
-  useEffect(() => {
+  useEffect(() => { //get total money from firebase after inicializaton
     if (uid && docWriteCompleted) {
       const currentMoney = async () => {
           if (userDoc.exists()) {
@@ -179,11 +179,11 @@ function Dashboard (){
     };
   }, [docWriteCompleted]);
 
-  useEffect(()=>{
+  useEffect(()=>{ //get the data for Line Chart
     if (docRead) {
     const getData = async () => {
       
-        const docArrays:any = [["Date", "Totalmoney"]];
+        const docArrays:Array<any> = [["Date", "Totalmoney"]];
         
         transactionDoc.forEach((doc:any)=>{
           const data = doc.data();
@@ -191,7 +191,7 @@ function Dashboard (){
           docArrays.push([ timeStamp, moneyTotal ])
         })
         const dataRows = docArrays.slice(1);
-        const formattedData = dataRows.map((row:[string, number]) => [row[0].slice(0,10), Number(row[1])]);
+        const formattedData = dataRows.map((row:[string, number | string]) => [row[0].slice(0,10), Number(row[1])]);
         const formattedDocArrays = [docArrays[0], ...formattedData];
         setChartData(formattedDocArrays)
     }
