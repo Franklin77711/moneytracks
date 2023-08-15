@@ -1,8 +1,7 @@
 import {useEffect, useState, useContext} from "react"
 import { Chart } from "react-google-charts";
 import { TransactionContext } from "../../Context/docSnaps";
-import { click } from "@testing-library/user-event/dist/click";
-
+import DrawChart from "../chartComponents/mainPieChart";
 
 function Statistics (){
     const {userDoc, transactionDoc, userDocRef, transactionDocRef} = useContext(TransactionContext);
@@ -58,46 +57,11 @@ function Statistics (){
             <div id="main-category-charts">
                 <div className="addMainChart chart">
                     <h1 className="mainChartTitle">Total Income Statistic</h1>
-                    <Chart
-                     width={"100%"}
-                     height={"300px"}
-                        chartType="PieChart"
-                        legendToggle
-                        data={Object.entries(categoryAddAmounts)}
-                        options={
-                          {
-                            legend: 'none',
-                            format: 'decimal',
-                            colors: ['#6f34ff'],
-                            lineWidth: 4,
-                            backgroundColor: 'transparent',
-                            pieHole: 0.45,
-                            is3D: false,
-                          }
-                        }
-                    />
+                    <DrawChart chartData={Object.entries(categoryAddAmounts)}/>
                 </div>
                 <div className="removeMainChart chart">
                 <h1 className="mainChartTitle">Total Expense Statistic</h1>
-                    <Chart
-                      chartType="PieChart"
-                      legendToggle
-                      width={"100%"}
-                      height={"300px"}
-                      data={Object.entries(categoryRemoveAmounts)}
-
-                      options={
-                        {
-                          legend: 'none',
-                          format: 'decimal',
-                          colors: ['#6f34ff'],
-                          lineWidth: 4,
-                          backgroundColor: 'transparent',
-                          pieHole: 0.45,
-                          is3D: false,
-                        }
-                      }
-                    />
+                <DrawChart chartData={Object.entries(categoryRemoveAmounts)}/>
                 </div>
             </div>
             <div id="subcategory-charts">
