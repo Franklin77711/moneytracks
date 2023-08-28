@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { getDoc, doc, collection, getDocs } from "firebase/firestore";
+import {collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebaseConf";
 import { UserContext } from "../../Context/loggedinUser";
 import { useContext } from "react";
@@ -119,7 +119,7 @@ function History (){
                 </table>
                 <button className="button" onClick={showMore}>Load more...</button>
               </>
-              ):""}
+              ):<div className="loader"></div>}
         </div>
     )
 }

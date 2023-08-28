@@ -18,9 +18,10 @@ function Dashboard (){
   const [totalIncome, setTotalIncome]=useState<number>(0);
   const [totalExpense, setTotalExpense]=useState<number>(0);
   const [showAddForm, setShowAddForm] = useState<boolean>(false);
-  const [formAddValue, setFormAddValue] = useState<number|any>(null);
-  const [formRemoveValue, setFormRemoveValue] = useState<number|any>(null);
+  const [formAddValue, setFormAddValue] = useState<number>(0);
+  const [formRemoveValue, setFormRemoveValue] = useState<number>(0);
   const [showExpenseForm, setShowExpenseForm] = useState<boolean>(false);
+  const [chartStartPoint, setChartStartPoint] = useState<number>(0);
 
   const [formSourceValueMain,setFormSourceValueMain] = useState<string>("");
   const [formSourceValueSub,setFormSourceValueSub] = useState<string>("");
@@ -65,7 +66,7 @@ function Dashboard (){
     updateDocMoneyAdd();
     updateDocMoney();
     createLogFromAdd();
-    setFormAddValue(null)
+    setFormAddValue(0)
     setFormSourceValueMain("");
     setFormSourceValueSub("")
     handleCancel();
@@ -76,7 +77,7 @@ function Dashboard (){
     updateDocMoneyRemove();
     updateDocMoneyTotal();
     createLogFromRemove();
-    setFormRemoveValue(null)
+    setFormRemoveValue(0)
     setFormReasonValueMain("")
     setFormReasonValueSub("")
     handleCancel();
@@ -188,11 +189,12 @@ function Dashboard (){
         transactionDoc.forEach((doc:any)=>{
           const data = doc.data();
           const { timeStamp, moneyTotal } = data;
-          docArrays.push([ timeStamp, moneyTotal ])
+          docArrays.push([ timeStamp.slice(5, 10), moneyTotal ])
         })
         const dataRows = docArrays.slice(1);
-        const formattedData = dataRows.map((row:[string, number | string]) => [row[0].slice(0,10), Number(row[1])]);
-        const formattedDocArrays = [docArrays[0], ...formattedData];
+        const formattedData = dataRows.reverse().slice(0,10).map((row:[string, number | string]) => [row[0].slice(0,10), Number(row[1])]);
+        const formattedDocArrays = [docArrays[0], ...formattedData.reverse()];
+        setChartStartPoint(formattedDocArrays[1][1])
         setChartData(formattedDocArrays)
     }
     getData()
@@ -241,7 +243,7 @@ function Dashboard (){
                             <div className="form-container">
                               <label htmlFor="main-category-add">Category:</label>
                               <select onChange={(e) => setFormSourceValueMain(e.target.value)} className="change-option" id="main-category-add">
-                                <option value="">Select Main Category</option>
+                                <option>Select Main Category</option>
                                 {earnCategoryOptions.map((category) => (
                                   <option key={category.value} value={category.value}>
                                     {category.label}
@@ -252,7 +254,7 @@ function Dashboard (){
                             <div className="form-container">
                               <label htmlFor="sub-category-add">Sub-Category:</label>
                               <select onChange={(e) => setFormSourceValueSub(e.target.value)} disabled={formSourceValueMain == ""} className="change-option" id="sub-category-add">
-                                  <option value="">Select Sub Category</option>
+                                  <option >Select Sub Category</option>
                                   {earnCategoryOptions
                                     .find((category) => category.value === formSourceValueMain)
                                     ?.subcategories.map((subcategory) => (
@@ -288,8 +290,8 @@ function Dashboard (){
                             </div>
                             <div className="form-container">
                               <label htmlFor="main-category-remove">Category:</label>
-                              <select onChange={(e) => setFormReasonValueMain(e.target.value)} className="change-option" id="main-category-remove">
-                                  <option value="" >Select Main Category</option>
+                              <select onChange={(e) => setFormReasonValueMain(e.target.value)} value={formReasonValueMain} className="change-option" id="main-category-remove">
+                                  <option  >Select Main Category</option>
                                   {expenseCategoryOptions.map((category) => (
                                     <option key={category.value} value={category.value}>
                                       {category.label}
@@ -299,8 +301,8 @@ function Dashboard (){
                               </div>
                               <div className="form-container">
                                 <label htmlFor="sub-category-remove"> Sub-Category:</label>
-                                <select onChange={(e) => setFormReasonValueSub(e.target.value)} disabled={formReasonValueMain == ""} className="change-option" id="sub-category-remove" required>
-                                    <option value="">Select Sub Category</option>
+                                <select onChange={(e) => setFormReasonValueSub(e.target.value)} value={formReasonValueSub} disabled={formReasonValueMain == ""} className="change-option" id="sub-category-remove" required>
+                                    <option >Select Sub Category</option>
                                     {expenseCategoryOptions
                                       .find((category) => category.value === formReasonValueMain)
                                       ?.subcategories.map((subcategory) => (
@@ -337,7 +339,14 @@ function Dashboard (){
           vAxis: {
             textStyle: {
               color: 'white'
-            }
+            },
+            viewWindow: {
+              min: {chartStartPoint}, //chart starting point
+            },
+            gridlines: {
+              color: 'gray', 
+              opacity: 0.1,  
+            },
           }
         }
       }
@@ -346,7 +355,7 @@ function Dashboard (){
           </div>
         </>
         :
-          <div id="loader"></div>
+          <div className="loader"></div>
         } 
       </div>
     )

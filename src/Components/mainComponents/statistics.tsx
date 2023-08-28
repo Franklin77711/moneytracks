@@ -97,8 +97,8 @@ function Statistics (){
             </div>
             <div id="subcategory-charts">
                       <div id="subcategory-selection">
-                            <label htmlFor="subcategorty">Select category for in depth</label>
-                            <select id="subcategorty" onChange={(e) => setSubCategorySelect(e.target.value)}>
+                            <label htmlFor="subcategorty">Select sub-category</label>
+                            <select id="subcategorty" className="change-option" onChange={(e) => setSubCategorySelect(e.target.value)}>
                                 <optgroup label="Expenses">
                                     {expenseCategoryOptions.map((category)=>(
                                         <option key={category.value} value={category.value}>{category.label}</option>
@@ -111,8 +111,8 @@ function Statistics (){
                                 </optgroup>
                             </select>
                       </div>
-                <div>
-                {JSON.stringify(subCategoryAmounts) !== JSON.stringify({Category: 'Amount'}) ? <DrawChart chartData={Object.entries(subCategoryAmounts)}/> : <div>No data in the selected category!</div>}
+                <div id="subChartDiv">
+                {JSON.stringify(subCategoryAmounts) !== JSON.stringify({Category: 'Amount'}) ? <DrawChart chartData={Object.entries(subCategoryAmounts)}/> : <div id="nodata">No data in the selected category!</div>}
                 </div>
             </div>
         </div>

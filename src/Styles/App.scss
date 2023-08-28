@@ -76,6 +76,25 @@
 
 
 .main{
+  .loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: conic-gradient(#0000 10%,#474bff);
+    -webkit-mask: radial-gradient(farthest-side,#0000 calc(100% - 9px),#000 0);
+    animation: loader 1s infinite linear;
+ }
+ .change-option{
+  font-family: 'Quicksand', sans-serif;
+  border-radius: 30px;
+  padding: 0.7em;
+}
   overflow-x: hidden;
   font-size: 24px;
   #welcome-page{
@@ -226,20 +245,6 @@
       padding-top: 3em;
       padding-left: clamp(1em, 5%, 3em);
       padding-right: clamp(1em, 10%, 15em);
-      #loader {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        margin: auto;
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        background: conic-gradient(#0000 10%,#474bff);
-        -webkit-mask: radial-gradient(farthest-side,#0000 calc(100% - 9px),#000 0);
-        animation: loader 1s infinite linear;
-     }
      
       #dash-header{
         display: flex;
@@ -344,12 +349,6 @@
             justify-content: space-between;
             gap: 1em;
             align-items: center;
-            .change-option{
-              font-family: 'Quicksand', sans-serif;
-              border-radius: 30px;
-              padding: 0.7em;
-              
-            }
           }
           .change-btn-container{
             padding: 0em 2em;
@@ -386,6 +385,7 @@
       }
     }
     #statistics{
+      min-height: 100vh;
       #main-category-charts{
         display: flex;
         width: 100svw;
@@ -398,6 +398,26 @@
           width: 100%;
           height: fit-content;
         }
+      }
+      #subcategory-charts{
+        #subcategory-selection{
+          display: grid;
+          justify-content: center;
+          align-items: center;
+          }
+          #subcategorty{
+            margin-top:  1em;
+          }
+      }
+      #subChartDiv{
+        min-height: 30vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #nodata{
+        margin: auto;
+        color: $error-red;
       }
     }
     #history{
