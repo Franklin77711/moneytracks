@@ -454,6 +454,19 @@
       .removeHistory{
         color: $error-red;
       }
+      .button{
+        margin-top: 0.3em;
+        border-radius: 15px;
+        padding: 1em;
+        cursor: pointer;
+        font-family: 'Quicksand', sans-serif;
+        background-color: $dark-btn;
+        color: $dark-text;
+        border: 1px solid $dark-text;
+        &:hover{
+          filter: brightness(.9);
+        }
+      }
     }
     #settings{
       #no-access{

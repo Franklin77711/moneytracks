@@ -12,6 +12,8 @@ function History (){
   const [docSnap, setDocSnap] = useState<any>(null);
   const [renderStart, setRenderStart] = useState<boolean>(false);
   const [docSpanRender, setDocSpanRender] = useState<any>(null);
+  const [maxLoad, setMaxLoad] = useState<number>(10);
+  
 
   const transHistory = async () => {
     if (uid) {
@@ -21,9 +23,9 @@ function History (){
       const docArrays:any = [];
 
       docSnapAll.forEach((doc)=>{
-        docArrays.push(doc.data())
+        docArrays.unshift(doc.data())
       })
-
+      setMaxLoad(10)
       setDocSnap(docArrays);
       setDocSpanRender(docArrays);
       setRenderStart(true)
@@ -41,6 +43,7 @@ function History (){
             incomeArr.push(doc)
           }
         })
+        setMaxLoad(10)
         setDocSpanRender(incomeArr);
       }
       const showOnlyExpense = () =>{
@@ -50,6 +53,7 @@ function History (){
             expenseArr.push(doc)
           }
         })
+        setMaxLoad(10)
         setDocSpanRender(expenseArr);
       }
       const showOnlyThisMonth = () =>{
@@ -62,7 +66,12 @@ function History (){
             }
           }
         })
+        setMaxLoad(10)
         setDocSpanRender(expenseArr);
+      }
+      const showMore =(e: React.MouseEvent<HTMLButtonElement>) =>{
+        e.preventDefault();
+        setMaxLoad(maxLoad + 10)
       }
 
     return(
@@ -75,7 +84,7 @@ function History (){
               <button onClick={showOnlyExpense}>Only Expense</button>
           </div>
             {renderStart ? 
-               (
+               (<>
                 <table>
                   <thead>
                     <tr>
@@ -87,7 +96,7 @@ function History (){
                     </tr>
                   </thead>
                   <tbody>
-                    {docSpanRender.slice().reverse().map((doc: any, index: number) => {
+                    {docSpanRender.slice(0, maxLoad).map((doc: any, index: number) => {
                       if (!doc.timeStamp || doc.category == "") {
                         return null;
                       }
@@ -108,6 +117,8 @@ function History (){
                     );})}
                   </tbody>
                 </table>
+                <button className="button" onClick={showMore}>Load more...</button>
+              </>
               ):""}
         </div>
     )
